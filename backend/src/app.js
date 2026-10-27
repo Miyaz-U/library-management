@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const bookRoutes = require("./routes/books");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -13,6 +14,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/books", bookRoutes);
 
 // Unknown URLs
 app.use((req, res) => {
