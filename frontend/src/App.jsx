@@ -1,21 +1,37 @@
-import { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+import Layout from "./components/Layout";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Books from "./pages/Books";
 
-function App() {
-  const [status, setStatus] = useState("Checking backend...");
-
-  useEffect(() => {
-    fetch("http://localhost:4000/api/health")
-      .then((res) => res.json())
-      .then((data) => setStatus(data.message))
-      .catch(() => setStatus("Could not reach the backend"));
-  }, []);
-
-  return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>Library Management System</h1>
-      <p>Backend status: {status}</p>
-    </div>
-  );
+// Pages that need a logged-in user
+function RequireAuth({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <p className="center-note">Loading...</p>;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
 }
 
-export default App;
+// Login and register pages: logged-in users are sent to the home page
+function GuestOnly({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <p className="center-note">Loading...</p>;
+  if (user) return <Navigate to="/" replace />;
+  return children;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
+      <Route path="/register" element={<GuestOnly><Register /></GuestOnly>} />
+
+      <Route element={<RequireAuth><Layout /></RequireAuth>}>
+        <Route path="/" element={<Books />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
