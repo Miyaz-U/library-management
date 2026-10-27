@@ -1,5 +1,6 @@
 const LOAN_DAYS = 14;     // how long a member may keep a book
 const FINE_PER_DAY = 5;   // rupees per overdue day
+const MAX_ACTIVE_LOANS = 3; // most books a member may hold at once
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 // Returns a new Date that is `days` after `date`
@@ -26,4 +27,4 @@ function calculateFine(dueDate, returnedAt) {
   return overdueDays(dueDate, returnedAt) * FINE_PER_DAY;
 }
 
-module.exports = { LOAN_DAYS, FINE_PER_DAY, addDays, overdueDays, calculateFine };
+module.exports = { LOAN_DAYS, FINE_PER_DAY, MAX_ACTIVE_LOANS, addDays, overdueDays, calculateFine };

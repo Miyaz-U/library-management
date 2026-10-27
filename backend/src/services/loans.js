@@ -1,6 +1,6 @@
 const { HttpError } = require("../utils/httpError");
-const { LOAN_DAYS, addDays, overdueDays, calculateFine } = require("../utils/fines");
-const { releaseCopy } = require("./reservations");
+const { LOAN_DAYS, MAX_ACTIVE_LOANS, addDays, overdueDays, calculateFine } = require("../utils/fines");
+const { releaseCopy, countActiveLoans } = require("./reservations");
 
 // One query that joins everything the UI needs to show a loan
 const LOAN_SELECT = `
@@ -56,6 +56,13 @@ function issueCopy(db, { memberId, copyCode, librarianId }, now = new Date()) {
     if (!member) throw new HttpError(404, "Member not found");
     if (member.role !== "member") {
       throw new HttpError(400, "Books can only be issued to member accounts");
+    }
+
+    if (countActiveLoans(db, memberId) >= MAX_ACTIVE_LOANS) {
+      throw new HttpError(
+        409,
+        `This member already has ${MAX_ACTIVE_LOANS} books. A book must be returned first`
+      );
     }
 
     const copy = db.prepare("SELECT id, status FROM copies WHERE copy_code = ?").get(copyCode);
@@ -118,4 +125,13 @@ function returnLoan(db, loanId, now = new Date()) {
   return run();
 }
 
-module.exports = { issueCopy, returnLoan, getLoan, listLoans };
+// Overdue report: open loans past their due date, most overdue first
+function overdueReport(db, now = new Date()) {
+  const loans = listLoans(db, { status: "open" }, now)
+    .filter((loan) => loan.is_overdue)
+    .sort((a, b) => b.overdue_days - a.overdue_days);
+  const totalFines = loans.reduce((sum, loan) => sum + loan.fine, 0);
+  return { count: loans.length, total_fines: totalFines, loans };
+}
+
+module.exports = { issueCopy, returnLoan, getLoan, listLoans, overdueReport };

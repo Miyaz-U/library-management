@@ -1,7 +1,15 @@
 const { HttpError } = require("../utils/httpError");
+const { MAX_ACTIVE_LOANS } = require("../utils/fines");
 
-// The first person waiting for a book: oldest created_at, then lowest id.
-// (Step 7 will skip members who already hold 3 books.)
+// How many books a member currently has out (open loans)
+function countActiveLoans(db, userId) {
+  return db
+    .prepare("SELECT COUNT(*) AS n FROM loans WHERE user_id = ? AND returned_at IS NULL")
+    .get(userId).n;
+}
+
+// The first ELIGIBLE person waiting for a book: oldest created_at, then lowest id.
+// Members who already hold the maximum number of books are skipped (they keep their place).
 function nextInQueue(db, bookId) {
   return db
     .prepare(
@@ -9,10 +17,12 @@ function nextInQueue(db, bookId) {
        FROM reservations r
        JOIN users u ON u.id = r.user_id
        WHERE r.book_id = ? AND r.status = 'waiting'
+         AND (SELECT COUNT(*) FROM loans l
+              WHERE l.user_id = r.user_id AND l.returned_at IS NULL) < ?
        ORDER BY r.created_at ASC, r.id ASC
        LIMIT 1`
     )
-    .get(bookId);
+    .get(bookId, MAX_ACTIVE_LOANS);
 }
 
 // Holds this copy for the next waiting member. Returns who it is held for, or null.
@@ -136,6 +146,7 @@ function listReservations(db, { id, userId, status } = {}) {
 }
 
 module.exports = {
+  countActiveLoans,
   releaseCopy,
   offerAvailableCopies,
   reserveBook,
