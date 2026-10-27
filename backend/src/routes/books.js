@@ -4,6 +4,7 @@ const { getDb } = require("../db/database");
 const { HttpError } = require("../utils/httpError");
 const { parseId } = require("../utils/validate");
 const { requireAuth, requireRole } = require("../middleware/auth");
+const { offerAvailableCopies } = require("../services/reservations");
 
 const router = express.Router();
 
@@ -151,7 +152,10 @@ router.post("/:id/copies", requireAuth, requireRole("librarian"), (req, res, nex
     const bookRow = db.prepare("SELECT id, isbn FROM books WHERE id = ?").get(id);
     if (!bookRow) throw new HttpError(404, "Book not found");
 
-    db.transaction(() => addCopies(db, bookRow, count))();
+    db.transaction(() => {
+      addCopies(db, bookRow, count);
+      offerAvailableCopies(db, id); // hand new copies to anyone already waiting
+    })();
 
     const book = db.prepare(`${BOOK_SELECT} WHERE b.id = ? GROUP BY b.id`).get(id);
     res.status(201).json({ book });

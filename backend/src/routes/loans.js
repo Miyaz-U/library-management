@@ -34,8 +34,12 @@ router.post("/:id/return", requireAuth, requireRole("librarian"), (req, res, nex
   try {
     const id = parseId(req.params.id);
     const db = getDb();
-    returnLoan(db, id);
-    res.json({ loan: getLoan(db, id) });
+    const { heldFor } = returnLoan(db, id);
+    res.json({
+      loan: getLoan(db, id),
+      copy_status: heldFor ? "on_hold" : "available",
+      held_for: heldFor,
+    });
   } catch (err) {
     next(err);
   }

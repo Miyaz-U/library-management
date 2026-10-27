@@ -1,5 +1,6 @@
 const { HttpError } = require("../utils/httpError");
 const { LOAN_DAYS, addDays, overdueDays, calculateFine } = require("../utils/fines");
+const { releaseCopy } = require("./reservations");
 
 // One query that joins everything the UI needs to show a loan
 const LOAN_SELECT = `
@@ -63,8 +64,16 @@ function issueCopy(db, { memberId, copyCode, librarianId }, now = new Date()) {
     if (copy.status === "on_loan") {
       throw new HttpError(409, "This copy is already issued to someone");
     }
+
+    // A held copy may only go to the member it is being held for
+    let reservation = null;
     if (copy.status === "on_hold") {
-      throw new HttpError(409, "This copy is being held for a reservation");
+      reservation = db
+        .prepare("SELECT id, user_id FROM reservations WHERE copy_id = ? AND status = 'offered'")
+        .get(copy.id);
+      if (!reservation || reservation.user_id !== memberId) {
+        throw new HttpError(409, "This copy is being held for another member's reservation");
+      }
     }
 
     const result = db
@@ -76,13 +85,17 @@ function issueCopy(db, { memberId, copyCode, librarianId }, now = new Date()) {
 
     db.prepare("UPDATE copies SET status = 'on_loan' WHERE id = ?").run(copy.id);
 
+    if (reservation) {
+      db.prepare("UPDATE reservations SET status = 'fulfilled' WHERE id = ?").run(reservation.id);
+    }
+
     return Number(result.lastInsertRowid);
   });
   return run();
 }
 
-// Returns a loan: saves the fine and frees the copy.
-// (Step 6 will change the last line so a reserved copy is held instead.)
+// Returns a loan: saves the fine, then holds the copy for the queue or frees it.
+// Result: { heldFor } is the member the copy is now held for, or null.
 function returnLoan(db, loanId, now = new Date()) {
   const run = db.transaction(() => {
     const loan = db.prepare("SELECT * FROM loans WHERE id = ?").get(loanId);
@@ -96,9 +109,11 @@ function returnLoan(db, loanId, now = new Date()) {
       fine,
       loanId
     );
-    db.prepare("UPDATE copies SET status = 'available' WHERE id = ?").run(loan.copy_id);
 
-    return loanId;
+    const copy = db.prepare("SELECT id, book_id FROM copies WHERE id = ?").get(loan.copy_id);
+    const heldFor = releaseCopy(db, copy.id, copy.book_id, now);
+
+    return { heldFor };
   });
   return run();
 }
