@@ -1,17 +1,25 @@
 const express = require("express");
 const cors = require("cors");
+const authRoutes = require("./routes/auth");
+const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
 
-// Allow the frontend (running on another port) to call this API
-app.use(cors());
-
-// Let Express read JSON sent in request bodies
+app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json());
 
-// Health check: a simple route to confirm the API is alive
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Library API is running" });
 });
+
+app.use("/api/auth", authRoutes);
+
+// Unknown URLs
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Must be last: catches every error thrown above
+app.use(errorHandler);
 
 module.exports = app;
