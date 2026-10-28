@@ -34,6 +34,7 @@ function BookRow({ book, onAddCopies }) {
           aria-label={`Copies to add to ${book.title}`}
           value={count}
           onChange={(e) => setCount(e.target.value)}
+          onWheel={(e) => e.target.blur()}
         />
         <button className="btn btn-small btn-ghost" disabled={busy} onClick={submit}>
           {busy ? "Adding..." : "Add copies"}
@@ -137,6 +138,7 @@ export default function ManageBooks() {
                 min="1"
                 value={form.copies}
                 onChange={setField("copies")}
+                onWheel={(e) => e.target.blur()}
               />
             </div>
           </div>
