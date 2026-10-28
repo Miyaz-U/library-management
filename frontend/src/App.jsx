@@ -4,6 +4,8 @@ import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Books from "./pages/Books";
+import MyLoans from "./pages/MyLoans";
+import MyReservations from "./pages/MyReservations";
 
 // Pages that need a logged-in user
 function RequireAuth({ children }) {
@@ -29,6 +31,8 @@ export default function App() {
 
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route path="/" element={<Books />} />
+        <Route path="/loans" element={<MyLoans />} />
+        <Route path="/reservations" element={<MyReservations />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

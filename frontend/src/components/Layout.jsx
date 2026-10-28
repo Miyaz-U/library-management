@@ -14,6 +14,12 @@ export default function Layout() {
             <NavLink to="/" end>
               Books
             </NavLink>
+            {user.role === "member" && (
+              <>
+                <NavLink to="/loans">My Loans</NavLink>
+                <NavLink to="/reservations">My Reservations</NavLink>
+              </>
+            )}
           </nav>
           <div className="user-box">
             <span className="user-name">{user.name}</span>
