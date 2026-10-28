@@ -86,6 +86,16 @@ describe("roles", () => {
     expect(search.body.books).toHaveLength(1);
     expect(search.body.books[0].available_copies).toBe(1);
   });
+
+  it("lists members for librarians only, never librarians", async () => {
+    const denied = await request(app).get("/api/members").set(auth(member));
+    expect(denied.status).toBe(403);
+
+    const ok = await request(app).get("/api/members").set(auth(librarian));
+    expect(ok.status).toBe(200);
+    expect(ok.body.members.length).toBeGreaterThanOrEqual(2);
+    expect(ok.body.members.some((m) => m.email === "asha@test.com")).toBe(false);
+  });
 });
 
 describe("end to end: borrow, reserve, return, hold", () => {

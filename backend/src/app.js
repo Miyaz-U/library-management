@@ -5,6 +5,7 @@ const bookRoutes = require("./routes/books");
 const loanRoutes = require("./routes/loans");
 const reservationRoutes = require("./routes/reservations");
 const reportRoutes = require("./routes/reports");
+const memberRoutes = require("./routes/members");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -21,6 +22,7 @@ app.use("/api/books", bookRoutes);
 app.use("/api/loans", loanRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/members", memberRoutes);
 
 // Unknown URLs
 app.use((req, res) => {
