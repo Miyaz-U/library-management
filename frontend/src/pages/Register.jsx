@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import ErrorMessage from "../components/ErrorMessage";
 import PasswordInput from "../components/PasswordInput";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Register() {
   const { register } = useAuth();
@@ -26,6 +27,9 @@ export default function Register() {
 
   return (
     <div className="auth-page">
+      <div className="auth-theme">
+        <ThemeToggle />
+      </div>
       <div className="auth-card">
         <h1>Create account</h1>
         <p className="muted">Member accounts can search, reserve and view their loans.</p>

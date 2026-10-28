@@ -1,17 +1,47 @@
 :root {
-    --bg: #f5f6fa;
-    --surface: #ffffff;
-    --text: #1c2333;
-    --muted: #5d6679;
-    --border: #dde1ea;
-    --primary: #2f5bea;
-    --primary-dark: #2448c4;
-    --green: #137a3f;
-    --green-bg: #e3f6ea;
-    --red: #b42318;
-    --red-bg: #fdecea;
-    --radius: 10px;
-  }
+  color-scheme: light;
+  --bg: #f5f6fa;
+  --surface: #ffffff;
+  --text: #1c2333;
+  --muted: #5d6679;
+  --border: #dde1ea;
+  --primary: #2f5bea;
+  --primary-dark: #2448c4;
+  --primary-soft: #e8edfd;
+  --hover-soft: #eef1fd;
+  --input-bg: #ffffff;
+  --chip-bg: #f0f2f7;
+  --green: #137a3f;
+  --green-bg: #e3f6ea;
+  --red: #b42318;
+  --red-bg: #fdecea;
+  --red-border: #f4c7c3;
+  --purple: #5b2fb0;
+  --purple-bg: #efe7ff;
+  --radius: 10px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1420;
+  --surface: #181e2d;
+  --text: #e8ebf3;
+  --muted: #9aa4ba;
+  --border: #2c3550;
+  --primary: #6b8cff;
+  --primary-dark: #8aa3ff;
+  --primary-soft: #232d4d;
+  --hover-soft: #212a45;
+  --input-bg: #121827;
+  --chip-bg: #232b40;
+  --green: #5fd38d;
+  --green-bg: #15382a;
+  --red: #ff8d84;
+  --red-bg: #3b1d1b;
+  --red-border: #6b2f2b;
+  --purple: #c3a6ff;
+  --purple-bg: #2f2350;
+}
   
   * {
     box-sizing: border-box;
@@ -81,7 +111,7 @@
   }
   
   .nav a.active {
-    background: #e8edfd;
+    background: var(--primary-soft);
     color: var(--primary);
   }
   
@@ -104,13 +134,13 @@
   }
   
   .badge-member {
-    background: #e8edfd;
+    background: var(--primary-soft);
     color: var(--primary-dark);
   }
   
   .badge-librarian {
-    background: #efe7ff;
-    color: #5b2fb0;
+    background: var(--purple-bg);
+    color: var(--purple);
   }
   
   @media (max-width: 600px) {
@@ -148,7 +178,7 @@
     font-size: 1rem; /* 16px stops iPhones from zooming in */
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fff;
+    background: var(--input-bg);
     color: var(--text);
   }
   
@@ -198,7 +228,7 @@
   }
   
   .btn-ghost:hover {
-    background: #eef1fd;
+    background: var(--hover-soft);
   }
   
   .alert {
@@ -210,7 +240,7 @@
   .alert-error {
     background: var(--red-bg);
     color: var(--red);
-    border: 1px solid #f4c7c3;
+    border: 1px solid var(--red-border);
   }
   
   .alert ul {
@@ -283,7 +313,7 @@
 }
 
 .password-toggle:hover {
-  background: #eef1fd;
+  background: var(--hover-soft);
 }
 
 .password-toggle:focus-visible {
@@ -330,7 +360,7 @@
   .chip {
     display: inline-block;
     padding: 0.1rem 0.55rem;
-    background: #f0f2f7;
+    background: var(--chip-bg);
     border-radius: 6px;
     font-size: 0.8rem;
   }
@@ -357,3 +387,23 @@
     background: var(--red-bg);
     color: var(--red);
   }
+
+  /* ---------- Theme toggle ---------- */
+.auth-theme {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.theme-toggle {
+  white-space: nowrap;
+}
+
+/* Smooth color change when switching themes */
+body,
+.topbar,
+.auth-card,
+.book-card,
+input {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}

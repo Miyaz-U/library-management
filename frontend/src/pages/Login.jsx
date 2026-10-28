@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import ErrorMessage from "../components/ErrorMessage";
 import PasswordInput from "../components/PasswordInput";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Login() {
   const { login } = useAuth();
@@ -31,6 +32,9 @@ export default function Login() {
 
   return (
     <div className="auth-page">
+      <div className="auth-theme">
+        <ThemeToggle />
+      </div>
       <div className="auth-card">
         <h1>Library Login</h1>
         <p className="muted">Sign in to search, borrow and reserve books.</p>
