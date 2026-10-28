@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import ErrorMessage from "../components/ErrorMessage";
+import PasswordInput from "../components/PasswordInput";
 
 export default function Register() {
   const { register } = useAuth();
@@ -53,9 +54,8 @@ export default function Register() {
           </div>
           <div className="field">
             <label htmlFor="password">Password (at least 8 characters)</label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

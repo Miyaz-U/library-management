@@ -255,6 +255,41 @@
     gap: 0.5rem;
     margin-top: 0.5rem;
   }
+
+  /* ---------- Password show/hide ---------- */
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  padding-right: 4.5rem; /* leave room so typed text never hides under the button */
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  min-height: 36px;
+  min-width: 52px;
+  padding: 0 0.6rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  background: #eef1fd;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
   
   /* ---------- Books ---------- */
   .search {
